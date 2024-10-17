@@ -4,7 +4,8 @@ import React, { useState } from "react";
 const generateTimeSlots = (numberOfCourts) => {
     const timeSlots = [];
     for (let hour = 0; hour < 24; hour++) {
-        const time = hour < 12 ? `${hour} AM` : `${hour - 12} PM`;
+        var time = hour < 12 ? `${hour} AM` : `${hour - 12} PM`;
+        if (hour == 12) time = "12 PM"
         timeSlots.push({ time, courts: Array(numberOfCourts).fill(null) });
     }
     return timeSlots;
@@ -15,7 +16,7 @@ const Schedule = ({ scheduleData, numberOfCourts, onBookSlot }) => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedSlot, setSelectedSlot] = useState(null);
     const [customerName, setCustomerName] = useState("");
-    const [contactInfo,setContactInfo] = useState("");
+    const [contactInfo, setContactInfo] = useState("");
 
     // Populate time slots based on the provided schedule data
     React.useEffect(() => {
@@ -33,6 +34,14 @@ const Schedule = ({ scheduleData, numberOfCourts, onBookSlot }) => {
             setAllTimeSlots(updatedSlots);
         }
     }, [scheduleData, numberOfCourts]);
+
+    if (!scheduleData) {
+        return (
+            <div className="text-center text-gray-600 py-4">
+                Select The required Centre, Date and Sports
+            </div>
+        );
+    }
 
     const handleCellClick = (index, courtIndex) => {
         // Open dialog if the slot is empty
@@ -54,15 +63,16 @@ const Schedule = ({ scheduleData, numberOfCourts, onBookSlot }) => {
             updatedSlots[selectedSlot.index].courts[selectedSlot.courtIndex] = { name: customerName };
             setAllTimeSlots(updatedSlots);
             setCustomerName(""); // Reset the customer name
+            setContactInfo(""); // Reset the contact info
             setDialogOpen(false); // Close the dialog
         }
     };
 
     return (
         <>
-            <div className="p-6 pb-0.5 border border-zinc-200 rounded-lg overflow-x-auto">
+            <div className="p-6 pb-0.5 border border-gray-300 rounded-lg overflow-x-auto shadow-md">
                 {/* Header */}
-                <div className="grid grid-cols-7 gap-2 bg-gray-200 rounded-lg mb-2">
+                <div className="grid grid-cols-7 gap-2 bg-gray-100 rounded-lg mb-2">
                     <div className="text-center font-medium py-2">Time</div>
                     {Array.from({ length: numberOfCourts }, (_, i) => (
                         <div key={i} className="text-center font-medium py-2">
@@ -76,9 +86,9 @@ const Schedule = ({ scheduleData, numberOfCourts, onBookSlot }) => {
                         <tbody>
                             {/* Schedule Rows */}
                             {allTimeSlots.map((slot, index) => (
-                                <tr key={index} className="even:bg-gray-50">
+                                <tr key={index} className="even:bg-gray-50 hover:bg-gray-200">
                                     {/* Time Slot */}
-                                    <td className="border w-[150px] border-zinc-300 px-2 py-2 text-center font-semibold bg-gray-100">
+                                    <td className="border w-[150px] border-gray-300 px-2 py-2 text-center font-semibold bg-gray-100">
                                         {slot.time}
                                     </td>
 
@@ -86,7 +96,7 @@ const Schedule = ({ scheduleData, numberOfCourts, onBookSlot }) => {
                                     {slot.courts.map((court, idx) => (
                                         <td
                                             key={idx}
-                                            className="border border-zinc-300 px-2 py-2 w-[150px] cursor-pointer"
+                                            className="border border-gray-300 px-2 py-2 w-[150px] cursor-pointer hover:bg-blue-100"
                                             onClick={() => handleCellClick(index, idx)} // Handle cell click
                                         >
                                             {court ? (
@@ -108,7 +118,7 @@ const Schedule = ({ scheduleData, numberOfCourts, onBookSlot }) => {
             {/* Booking Dialog */}
             {dialogOpen && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-                    <div className="bg-white p-4 rounded shadow-lg">
+                    <div className="bg-white p-4 rounded shadow-lg w-1/3">
                         <h3 className="text-lg font-semibold mb-2">Book a Slot</h3>
                         <form onSubmit={handleSubmit}>
                             <label className="block mb-2">
@@ -132,41 +142,13 @@ const Schedule = ({ scheduleData, numberOfCourts, onBookSlot }) => {
                                 />
                             </label>
                             <div className="flex justify-between mt-4">
-                                <button type="button" onClick={() => setDialogOpen(false)} className="border px-4 py-2 rounded">Cancel</button>
-                                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Book</button>
+                                <button type="button" onClick={() => setDialogOpen(false)} className="border px-4 py-2 rounded hover:bg-gray-200">Cancel</button>
+                                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Book</button>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
-
-            {/* Info Legend */}
-            <div className="flex flex-wrap gap-4 text-xs mt-3">
-                <div className="flex items-center">
-                    <div className="w-4 h-4 rounded border bg-yellow-200 mr-2"></div>
-                    <div>Bookings</div>
-                </div>
-                <div className="flex items-center">
-                    <div className="w-4 h-4 rounded border bg-green-200 mr-2"></div>
-                    <div>Checked-in</div>
-                </div>
-                <div className="flex items-center">
-                    <div className="w-4 h-4 rounded border bg-blue-200 mr-2"></div>
-                    <div>Coaching</div>
-                </div>
-                <div className="flex items-center">
-                    <div className="w-4 h-4 rounded border bg-zinc-200 mr-2"></div>
-                    <div>Blocked/Tournament</div>
-                </div>
-                <div className="flex items-center">
-                    <div className="w-4 h-4 rounded border bg-purple-200 mr-2"></div>
-                    <div>Completed</div>
-                </div>
-                <div className="flex items-center">
-                    <div className="w-4 h-4 rounded border bg-pink-200 mr-2"></div>
-                    <div>Pending Payment/Collect Items</div>
-                </div>
-            </div>
         </>
     );
 };
