@@ -15,8 +15,17 @@ router.post('/getslots', async (req, res) => {
       }
   
       // Find the date in the schedule
-      const selectedDate = schedule.dates.find(d => d.date.toISOString() === new Date(date).toISOString());
-  
+        const selectedDate = schedule.dates.find(d => {
+            const scheduleDate = new Date(d.date); // Convert the schedule date to Date object
+            const inputDate = new Date(date); // Convert the input date to Date object
+            
+            return (
+                scheduleDate.getFullYear() === inputDate.getFullYear() &&
+                scheduleDate.getMonth() === inputDate.getMonth() &&
+                scheduleDate.getDate() === inputDate.getDate()
+            );
+        });
+
       if (!selectedDate) {
         return res.status(200).json({ slots: [] });
       }

@@ -94,4 +94,13 @@ router.post('/:centreId/addsport', async (req, res) => {
     }
 });
 
+router.get('/all', async (req, res) => {
+    try {
+        const centres = await Centre.find(); // Fetch all centre documents
+        return res.status(200).json(centres); // Return the centres as JSON
+      } catch (error) {
+        return res.status(500).json({ message: 'Internal Server Error', error: error.message });
+      }
+});
+
 module.exports = router;

@@ -7,7 +7,7 @@ const Booking = require('../models/Booking');
 require('dotenv').config();
 
 // View Bookings for a specific centre, sport, and date
-router.get('/view', async (req, res) => {
+router.post('/view', async (req, res) => {
     const { centreId, sport, date } = req.body;
   
     try {
@@ -40,7 +40,6 @@ router.get('/view', async (req, res) => {
             scheduleId: court.schedule, // Pass the scheduleId
             date: date // Pass the date
           });
-          console.log('1');
   
           const { slots } = scheduleResponse.data;
   
